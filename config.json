@@ -1,0 +1,28 @@
+{
+    "misc": {
+        "application_id":0,
+        "session_id": "",
+        "channel_id": 0,
+        "guild_id": 0,
+        "token": ""
+    },
+
+    "delays": {
+        "rebirth": 3600,
+        "wings": 340,
+        "fish": 320,
+        "hunt": 320,
+        "claimall": 360
+    },
+
+    "message_id": {
+        "sell": 0,
+        "upgradePickaxeAll": 0,
+        "upgradeBackpackAll": 0,
+        "wings": 0,
+        "rebirth": 0,
+        "hunt": 0,
+        "fish": 0,
+        "claimall": 0
+    }
+}
