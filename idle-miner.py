@@ -11,15 +11,16 @@ url = "https://discord.com/api/v9/interactions"
 with open("config.json", "r") as file:
     config = json.loads(file.read())
 
+miscConfig = config["misc"]
 
 headers = {
     "accept": "*/*",
     "accept-encoding": "gzip, deflate, br",
     "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
-    "authorization": config["misc"]["token"],
+    "authorization": miscConfig["token"],
     "content-type": "application/json",
     "origin": "https://discord.com",
-    "referer": "https://discord.com/channels/{}/{}".format(config["misc"]["guild_id"], config["misc"]["channel_id"]),
+    "referer": "https://discord.com/channels/{}/{}".format(miscConfig["guild_id"], miscConfig["channel_id"]),
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-origin",
@@ -44,72 +45,37 @@ class Data():
         nonce = ''.join(random.choice(string.digits) for x in range(18))
         return {"type":3,"nonce":f"{nonce}","guild_id":f"{self.guild_id}","channel_id":f"{self.channel_id}","message_flags":0,"message_id":f"{self.message_id}","application_id":f"{self.application_id}","session_id":f"{self.session_id}","data":{"component_type":int(self.component_type),"custom_id":f"{self.custom_id}"}}
 
-def sell():
-    contextConfig = config["sell"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="sell").params(), headers=headers)
-    return resp
 
-def upgradePick():
-    contextConfig = config["upgradePick"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="upgradePickaxeAll").params(), headers=headers)
-    return resp
-
-def upgradeBackPack():
-    contextConfig = config["upgradeBackPack"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="upgradeBackpackAll").params(), headers=headers)
-    return resp
-
-def wings():
-    contextConfig = config["wings"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="wings").params(), headers=headers)
-    return resp
-    
-def rebirth():
-    contextConfig = config["rebirth"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="rebirth").params(), headers=headers)
-    return resp
-
-def hunt():
-    contextConfig = config["hunt"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="hunt").params(), headers=headers)
-    return resp
-
-def fish():
-    contextConfig = config["fish"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="fish").params(), headers=headers)
-    return resp
-
-def claimall():
-    contextConfig = config["claimall"]
-    resp = requests.post(url, json=Data(channel_id=config["misc"]["channel_id"], guild_id=config["misc"]["guild_id"], message_id=contextConfig["message_id"], application_id=config["misc"]["application_id"], session_id=config["misc"]["session_id"], component_type=2, custom_id="claimall").params(), headers=headers)
+def execute(custom_id):
+    resp = requests.post(url, json=Data(channel_id=miscConfig["channel_id"], guild_id=miscConfig["guild_id"], message_id=config["message_id"][custom_id], application_id=miscConfig["application_id"], session_id=miscConfig["session_id"], component_type=2, custom_id=custom_id).params(), headers=headers)
     return resp
 
 def getTime():
     thetime = time.localtime()
     thetime = f"{thetime.tm_year}/{thetime.tm_mon}/{thetime.tm_mday} {thetime.tm_hour}:{thetime.tm_min}:{thetime.tm_sec}"
-    return thetime
+    return f"{Fore.RESET}{thetime}"
 
-print(f"{Fore.RESET}<{getTime()}> \n{Fore.BLUE}Fish:            {Style.BRIGHT}{Fore.GREEN}" + str(fish().status_code))
+print("{}<{}>\n{}Fish:               {}{}{}".format(Fore.RESET, getTime(), Fore.BLUE, Style.BRIGHT, Fore.GREEN, execute("fish").status_code))
 last_fish = time.time()
 
 time.sleep(1)
 
-print(f"{Fore.RESET}<{getTime()}> \n{Fore.LIGHTBLACK_EX}Hunt:            {Style.BRIGHT}{Fore.GREEN}" + str(hunt().status_code))
+print("{}<{}>\n{}Hunt:               {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTBLACK_EX, Style.BRIGHT, Fore.GREEN, execute("hunt").status_code))
 last_hunt = time.time()
 
 time.sleep(1)
 
-print(f"{Fore.RESET}<{getTime()}> \n{Fore.RED}Claim All:       {Style.BRIGHT}{Fore.GREEN}" + str(claimall().status_code))
+print("{}<{}>\n{}Claim All:          {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("claimall").status_code))
 last_claim = time.time()
 
 time.sleep(1)
 
-print(f"{Fore.RESET}<{getTime()}> \n{Fore.YELLOW}Rebirth:         {Style.BRIGHT}{Fore.GREEN}" + str(rebirth().status_code))
+print("{}<{}>\n{}Rebirth:            {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("rebirth").status_code))
 last_rebirth = time.time()
 
-time.sleep(2)
+time.sleep(1)
 
-print(f"{Fore.RESET}<{getTime()}> \n{Fore.MAGENTA}Wings:           {Style.BRIGHT}{Fore.GREEN}" + str(wings().status_code))
+print("{}<{}>\n{}Wings:              {}{}{}".format(Fore.RESET, getTime(), Fore.MAGENTA, Style.BRIGHT, Fore.GREEN, execute("wings").status_code))
 last_wings = time.time()
 
 time.sleep(1)
@@ -117,43 +83,48 @@ time.sleep(1)
 
 while True:
     if time.time() - last_rebirth >= config["delays"]["rebirth"]:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.YELLOW}Rebirth:         {Style.BRIGHT}{Fore.GREEN}" + str(rebirth().status_code))
+        print("{}<{}>\n{}Rebirth:            {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("rebirth").status_code))
+
         last_rebirth = time.time()
         time.sleep(2)
 
     if time.time() - last_hunt >= config["delays"]["hunt"]:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.LIGHTBLACK_EX}Hunt:            {Style.BRIGHT}{Fore.GREEN}" + str(hunt().status_code))
+        print("{}<{}>\n{}Hunt:               {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTBLACK_EX, Style.BRIGHT, Fore.GREEN, execute("hunt").status_code))
+
         last_hunt = time.time()
         time.sleep(2)
 
     if time.time() - last_fish >= config["delays"]["fish"]:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.BLUE}Fish:            {Style.BRIGHT}{Fore.GREEN}" + str(fish().status_code))
+        print("{}<{}>\n{}Fish:               {}{}{}".format(Fore.RESET, getTime(), Fore.BLUE, Style.BRIGHT, Fore.GREEN, execute("fish").status_code))
+
         last_fish = time.time()
         time.sleep(2)
 
     if time.time() - last_claim >= config["delays"]["claimall"]:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.RED}Claim All:       {Style.BRIGHT}{Fore.GREEN}" + str(claimall().status_code))
+        print("{}<{}>\n{}Claim All:          {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("claimall").status_code))
+
         last_claim = time.time()
         time.sleep(2)
 
     if time.time() - last_wings >= config["delays"]["wings"]:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.MAGENTA}Wings:           {Style.BRIGHT}{Fore.GREEN}" + str(wings().status_code))
+        print("{}<{}>\n{}Wings:              {}{}{}".format(Fore.RESET, getTime(), Fore.MAGENTA, Style.BRIGHT, Fore.GREEN, execute("wings").status_code))
+
         last_wings = time.time()
         time.sleep(5)
 
-    print(f"{Fore.RESET}<{getTime()}> \n{Fore.CYAN}Sell:            {Style.BRIGHT}{Fore.GREEN}" + str(sell().status_code))
+    print("{}<{}>\n{}Sell:               {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("sell").status_code))
 
     slep = random.randint(20, 60)
-    print(f"{Fore.RESET}<{getTime()}> \n{Fore.WHITE}Sleep:           {Style.BRIGHT}{Fore.WHITE}" + str(slep) + " seconds")
+    print(f"<{getTime()}>\n{Fore.WHITE}Sleep:              {Style.BRIGHT}{Fore.WHITE}" + str(slep) + " seconds")
     time.sleep(slep)
 
     do = random.choice([True, False, None, None])
     if do:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.YELLOW}upgradePick:     {Style.BRIGHT}{Fore.GREEN}" + str(upgradePick().status_code))
+        print("{}<{}>\n{}Upgrade Pick:       {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("upgradePickaxeAll").status_code))
     elif do == False:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.YELLOW}upgradeBackPack: {Style.BRIGHT}{Fore.GREEN}" + str(upgradeBackPack().status_code))
+        print("{}<{}>\n{}Upgrade Backpack:   {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("upgradeBackpackAll").status_code))
     else:
-        print(f"{Fore.RESET}<{getTime()}> \n{Fore.WHITE}Nothing          ")
+        print("{}<{}>\n{}Nothing:            ".format(Fore.RESET, getTime(), Fore.WHITE))
         pass
  
 
