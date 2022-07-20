@@ -1,6 +1,6 @@
 {
     "misc": {
-        "application_id":0,
+        "application_id":518759221098053634,
         "session_id": "",
         "channel_id": 0,
         "guild_id": 0,
@@ -8,12 +8,35 @@
     },
 
     "delays": {
-        "rebirth": 3600,
-        "wings": 340,
         "fish": 320,
         "hunt": 320,
-        "claimall": 360
+        "claimall": 360,
+        "rebirth": 1600,
+        "wings": 340,
+        "rage": 360,
+        "earthquake": 340,
+        "min_sleep": 15,
+        "max_sleep": 30
+
     },
+
+
+    "commands": {
+        "plant": true,
+        "bonemeal": true, 
+        "fish": true,
+        "hunt": true,
+        "claimall": true,
+        "rebirth": true,
+        "wings": false,
+        "rage": false,
+        "earthquake": false,
+        "sell": true,
+        "upgradeBackpackAll": true,
+        "upgradePickaxeAll": true,
+        "chances": [true, false, null, null]
+    },
+
 
     "message_id": {
         "sell": 0,
@@ -23,6 +46,21 @@
         "rebirth": 0,
         "hunt": 0,
         "fish": 0,
-        "claimall": 0
+        "claimall": 0,
+        "rage": 0,
+        "earthquake": 0
+    },
+
+    "plants": {
+        "carrot_delay": 1260,
+        "potato_delay": 1260,
+        "pumpkin_delay": 1260,
+        "melon_delay": 2460,
+        "beetroot_delay": 7260,
+        "bonemeal_delay": 1860,
+        "bonemeal_area": ["x1", "x2"]
     }
+
+
+    
 }
