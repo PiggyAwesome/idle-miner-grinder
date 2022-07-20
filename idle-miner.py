@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from email import header
 from click import style
 import httpx, requests, random, string, time, json
 from colorama import Fore
@@ -12,6 +13,7 @@ with open("config.json", "r") as file:
     config = json.loads(file.read())
 
 miscConfig = config["misc"]
+commandsConfig = config["commands"]
 
 headers = {
     "accept": "*/*",
@@ -50,82 +52,126 @@ def execute(custom_id):
     resp = requests.post(url, json=Data(channel_id=miscConfig["channel_id"], guild_id=miscConfig["guild_id"], message_id=config["message_id"][custom_id], application_id=miscConfig["application_id"], session_id=miscConfig["session_id"], component_type=2, custom_id=custom_id).params(), headers=headers)
     return resp
 
+def sendmsg(msg):
+    msgUrl = f"https://discord.com/api/v9/channels/{config['misc']['channel_id']}/messages"
+    nonce = ''.join(random.choice(string.digits) for x in range(18))
+    resp = requests.post(msgUrl, json={"content":f"{msg}","nonce":f"{nonce}","tts":False}, headers=headers)
+    return resp
+
+def choosePlant():
+    plants = ["carrot", "potato", "melon", "pumpkin", "beetroot"]
+    plant = random.choice(plants)
+    if plant in ["carrot"]:
+        plantDelay = config["plants"]["carrot_delay"]
+    if plant in ["potato"]:
+        plantDelay = config["plants"]["potato_delay"]
+    if plant in ['pumpkin']:
+        plantDelay = config["plants"]["pumpkin_delay"]
+    elif plant == "melon":
+        plantDelay = config["plants"]["melon_delay"]
+    elif plant == "beetroot":
+        plantDelay = config["plants"]["beetroot_delay"]
+    return plant, plantDelay
+
 def getTime():
     thetime = time.localtime()
     thetime = f"{thetime.tm_year}/{thetime.tm_mon}/{thetime.tm_mday} {thetime.tm_hour}:{thetime.tm_min}:{thetime.tm_sec}"
     return f"{Fore.RESET}{thetime}"
 
-print("{}<{}>\n{}Fish:               {}{}{}".format(Fore.RESET, getTime(), Fore.BLUE, Style.BRIGHT, Fore.GREEN, execute("fish").status_code))
-last_fish = time.time()
+last_fish = time.time() - config["delays"]["fish"]
+last_hunt = time.time() - config["delays"]["hunt"]
+last_claim = time.time() - config["delays"]["claimall"]
+last_rebirth = time.time() - config["delays"]["rebirth"]
+plant, plantDelay = choosePlant()
+last_plant = time.time() - plantDelay
+last_bonemeal = time.time() - config["plants"]["bonemeal_delay"]
+last_wings = time.time() - config["delays"]["wings"]
+last_rage = time.time() - config["delays"]["rage"]
+last_earthquake = time.time() - config["delays"]["earthquake"]
 
-time.sleep(1)
 
-print("{}<{}>\n{}Hunt:               {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTBLACK_EX, Style.BRIGHT, Fore.GREEN, execute("hunt").status_code))
-last_hunt = time.time()
 
-time.sleep(1)
-
-print("{}<{}>\n{}Claim All:          {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("claimall").status_code))
-last_claim = time.time()
-
-time.sleep(1)
-
-print("{}<{}>\n{}Rebirth:            {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("rebirth").status_code))
-last_rebirth = time.time()
-
-time.sleep(1)
-
-print("{}<{}>\n{}Wings:              {}{}{}".format(Fore.RESET, getTime(), Fore.MAGENTA, Style.BRIGHT, Fore.GREEN, execute("wings").status_code))
-last_wings = time.time()
-
-time.sleep(1)
+time.sleep(2)
 
 
 while True:
-    if time.time() - last_rebirth >= config["delays"]["rebirth"]:
-        print("{}<{}>\n{}Rebirth:            {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("rebirth").status_code))
+    try:
+        if commandsConfig["rebirth"] and time.time() - last_rebirth >= config["delays"]["rebirth"]:
+            print("{}<{}>\n{}Rebirth:            {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("rebirth").status_code))
 
-        last_rebirth = time.time()
+            last_rebirth = time.time()
+            time.sleep(2)
+
+        if commandsConfig["hunt"] and time.time() - last_hunt >= config["delays"]["hunt"]:
+            print("{}<{}>\n{}Hunt:               {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTBLACK_EX, Style.BRIGHT, Fore.GREEN, execute("hunt").status_code))
+
+            last_hunt = time.time()
+            time.sleep(2)
+
+        if commandsConfig["fish"] and time.time() - last_fish >= config["delays"]["fish"]:
+            print("{}<{}>\n{}Fish:               {}{}{}".format(Fore.RESET, getTime(), Fore.BLUE, Style.BRIGHT, Fore.GREEN, execute("fish").status_code))
+
+            last_fish = time.time()
+            time.sleep(2)
+
+        if commandsConfig["claimall"] and time.time() - last_claim >= config["delays"]["claimall"]:
+            print("{}<{}>\n{}Claim All:          {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("claimall").status_code))
+
+            last_claim = time.time()
+            time.sleep(2)
+
+        if commandsConfig["plant"] and time.time() - last_plant >= plantDelay:
+            print("{}<{}>\n{}Harvest:            {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTYELLOW_EX, Style.BRIGHT, Fore.GREEN, sendmsg(f"<@518759221098053634> harvest").status_code))
+
+            plant, plantDelay = choosePlant()
+            print("{}<{}>\n{}Plant:              {}{}{} | {}".format(Fore.RESET, getTime(), Fore.LIGHTGREEN_EX, Style.BRIGHT, Fore.GREEN, sendmsg(f"<@518759221098053634> plant all {plant}").status_code, plant))
+
+            last_plant = time.time()
+            time.sleep(2)
+
+        if commandsConfig["bonemeal"] and time.time() - last_bonemeal >= config["plants"]["bonemeal_delay"]:
+            for area in config["plants"]["bonemeal_area"]:
+                print("{}<{}>\n{}Bonemeal:           {}{}{} | {}".format(Fore.RESET, getTime(), Fore.LIGHTWHITE_EX, Style.BRIGHT, Fore.GREEN, sendmsg(f"<@518759221098053634> bonemeal {area}").status_code, area))
+
+            last_bonemeal = time.time()
+            time.sleep(2)
+
+        if commandsConfig["wings"] and time.time() - last_wings >= config["delays"]["wings"]:
+            print("{}<{}>\n{}Wings:              {}{}{}".format(Fore.RESET, getTime(), Fore.MAGENTA, Style.BRIGHT, Fore.GREEN, execute("wings").status_code))
+
+            last_wings = time.time()
+            time.sleep(2)
+
+        if commandsConfig["rage"] and time.time() - last_rage >= config["delays"]["rage"]:
+            print("{}<{}>\n{}Rage:          {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("rage").status_code))
+
+            last_rage = time.time()
+            time.sleep(2)
+
+        if commandsConfig["earthquake"] and time.time() - last_earthquake >= config["delays"]["earthquake"]:
+            print("{}<{}>\n{}Earthquake:              {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTGREEN_EX, Style.BRIGHT, Fore.GREEN, execute("earthquake").status_code))
+
+            last_earthquake = time.time()
+            time.sleep(2)
+
+        if commandsConfig["sell"]:
+            print("{}<{}>\n{}Sell:               {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("sell").status_code))
+
+        slep = random.randint(config["delays"]["min_sleep"], config["delays"]["max_sleep"])
+        print(f"<{getTime()}>\n{Fore.WHITE}Sleep:              {Style.BRIGHT}{Fore.WHITE}" + str(slep) + " seconds")
+        time.sleep(slep)
+
+        do = random.choice(commandsConfig["chances"])
+        if do and commandsConfig["upgradePickaxeAll"]:
+            print("{}<{}>\n{}Upgrade Pick:       {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("upgradePickaxeAll").status_code))
+        elif do == False and commandsConfig["upgradeBackpackAll"]:
+            print("{}<{}>\n{}Upgrade Backpack:   {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("upgradeBackpackAll").status_code))
+        else:
+            print("{}<{}>\n{}Nothing:            ".format(Fore.RESET, getTime(), Fore.WHITE))
+            pass
+        
+
         time.sleep(2)
-
-    if time.time() - last_hunt >= config["delays"]["hunt"]:
-        print("{}<{}>\n{}Hunt:               {}{}{}".format(Fore.RESET, getTime(), Fore.LIGHTBLACK_EX, Style.BRIGHT, Fore.GREEN, execute("hunt").status_code))
-
-        last_hunt = time.time()
-        time.sleep(2)
-
-    if time.time() - last_fish >= config["delays"]["fish"]:
-        print("{}<{}>\n{}Fish:               {}{}{}".format(Fore.RESET, getTime(), Fore.BLUE, Style.BRIGHT, Fore.GREEN, execute("fish").status_code))
-
-        last_fish = time.time()
-        time.sleep(2)
-
-    if time.time() - last_claim >= config["delays"]["claimall"]:
-        print("{}<{}>\n{}Claim All:          {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("claimall").status_code))
-
-        last_claim = time.time()
-        time.sleep(2)
-
-    if time.time() - last_wings >= config["delays"]["wings"]:
-        print("{}<{}>\n{}Wings:              {}{}{}".format(Fore.RESET, getTime(), Fore.MAGENTA, Style.BRIGHT, Fore.GREEN, execute("wings").status_code))
-
-        last_wings = time.time()
-        time.sleep(5)
-
-    print("{}<{}>\n{}Sell:               {}{}{}".format(Fore.RESET, getTime(), Fore.RED, Style.BRIGHT, Fore.GREEN, execute("sell").status_code))
-
-    slep = random.randint(20, 60)
-    print(f"<{getTime()}>\n{Fore.WHITE}Sleep:              {Style.BRIGHT}{Fore.WHITE}" + str(slep) + " seconds")
-    time.sleep(slep)
-
-    do = random.choice([True, False, None, None])
-    if do:
-        print("{}<{}>\n{}Upgrade Pick:       {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("upgradePickaxeAll").status_code))
-    elif do == False:
-        print("{}<{}>\n{}Upgrade Backpack:   {}{}{}".format(Fore.RESET, getTime(), Fore.YELLOW, Style.BRIGHT, Fore.GREEN, execute("upgradeBackpackAll").status_code))
-    else:
-        print("{}<{}>\n{}Nothing:            ".format(Fore.RESET, getTime(), Fore.WHITE))
+    except Exception as e:
+        print(e) 
         pass
- 
-
-    time.sleep(2)
